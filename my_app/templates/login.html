@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="content-section container mt-5 ">
+    <form method="post" action="" novalidate>
+        <!-- get: take data through url, post: takes data not through url -->
+        <!-- action tells where to take that data, "" means we post the form data in the same route that we are in right now -->
+        {{ form.hidden_tag() }}
+        <fieldset class=" p-4 rounded">
+            <legend class="mb-4 text-center"> Log In </legend>
+            
+            <div  class="">
+                {{ form.email.label(class="form-control-label") }}
+                {% if form.email.errors %}
+                {{ form.email(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.email(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div  class="">
+                {{ form.password.label(class="form-control-label") }}
+                {% if form.password.errors %}
+                {{ form.password(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.password(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div>
+                {{ form.remember(class="form-check-input") }}
+                {{ form.remember.label(class="form-check-label") }}
+            </div>
+        </fieldset>
+        <div>
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+        <small>
+            <a href="{{ url_for('users.reset_request') }}">forgot Password</a>
+        </small>
+
+    </form>
+
+</div>
+<div >
+    <small>
+        Create an Account? <a href="{{ url_for('users.register') }}">Sign Up</a>
+        <!-- "login" here is the  route function name under the route -->
+    </small>
+</div>
+{% endblock content %}

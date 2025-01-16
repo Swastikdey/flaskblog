@@ -1,0 +1,46 @@
+<!-- THIS IS USED BY UPDATE AND CREATE POST ROUTES -->
+{% extends 'layout.html' %}
+{% block content %}
+<div class="content-section container mt-5 ">
+    <form method="post" action="" >
+        <!-- get: take data through url, post: takes data not through url -->
+        <!-- action tells where to take that data, "" means we post the form data in the same route that we are in right now -->
+        {{ form.hidden_tag() }}
+        <fieldset class=" p-4 rounded">
+            <legend class="mb-4 text-center"> {{ legend }} </legend>
+
+            <div class="">
+                {{ form.title.label(class="form-control-label") }}
+                {% if form.title.errors %}
+                {{ form.title(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.title.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.title(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="">
+                {{ form.content.label(class="form-control-label") }}
+                {% if form.content.errors %}
+                {{ form.content(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.content.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.content(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div>
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+
+    </form>
+
+</div>
+{% endblock content %}

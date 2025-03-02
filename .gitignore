@@ -1,0 +1,4 @@
+my_app/config.py
+env
+*.pyc
+my_app/__pycache__

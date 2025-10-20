@@ -1,4 +1,3 @@
-#ddd
 import os
 
 class Config:

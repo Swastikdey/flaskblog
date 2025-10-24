@@ -1,22 +1,58 @@
 {% extends 'layout.html' %}
 {% block content %}
-     <h1> Posts by {{ user.username }} ({{ posts.total }})</h1>
+<!-- ===== This is the user profile page ===== -->
+<!-- ===== User Profile Header ===== -->
+    <div class="card mb-4" style="max-width: 600px; margin:auto;">
+        <div class="card-body d-flex align-items-center">
+            <img class="rounded-circle mr-3" src="{{ image_file }}" width="80" height="80">
+            <div>
+                <h3>{{ user.username }}</h3>
+                <p>
+                    {{ user.posts|length }} Posts |
+                    {{ user.followers.count() }} Followers |
+                    {{ user.following.count() }} Following
+                </p>
+            </div>
+            <div class="ml-auto">
+                {% if current_user.is_authenticated and current_user != user %}
+                    <form action="{{ url_for('users.follow', user_id=user.id) }}" method="POST" style="padding-left: 20px;">
+                        {% if user in current_user.following %}
+                            <button class="btn btn-warning btn-sm" formaction="{{ url_for('users.unfollow', user_id=user.id) }}">Unfollow</button>
+                        {% else %}
+                            <button class="btn btn-primary btn-sm">Follow</button>
+                        {% endif %}
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+<!-- ===== User Posts ===== -->
+    <h4 class="mb-3 text-center">Posts by {{ user.username }} ({{ posts.total }})</h4>
+
     {% for post in posts.items %}
-    <!-- show the posts as per last modified first-->
-        <article class="media content-section">
-            <img class="rounded-circle article-img" src="{{ url_for( 'static', filename = 'profile_pics/' + post.author.image_file ) }}">
-            <div class="media-body">
+    <article class="media content-section mb-3">
+        <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+        <div class="media-body">
             <div class="article-metadata">
                 <a class="mr-2" href="#">{{ post.author.username }}</a>
                 <small class="text-muted">{{ post.date_posted.strftime('%d-%m-%Y') }}</small>
             </div>
             <h5><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h5>
             <p class="article-content">{{ post.content }}</p>
-            </div>
-        </article>
+        </div>
+    </article>
     {% endfor %}
 
+    <div class="text-center">
     {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+            {% if page_num==posts.page %}
+                <a href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}" class="btn btn-secondary">{{ page_num }}</a>
+            {% else %}
+                <a href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}" class="btn btn-outline-secondary">{{ page_num }}</a>
+            {% endif %}
+        {% else %}{% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
         {% if page_num %}
             {% if page_num==posts.page %}
                 <a href="{{ url_for('users.user_posts', username=user.username, page=page_num) }}" class="btn btn-secondary">{{ page_num }}</a>
@@ -27,4 +63,8 @@
             ...
         {% endif %}
     {% endfor %}
+            ...
+        {% endif %}
+    {% endfor %}
+    </div>
 {% endblock content %}

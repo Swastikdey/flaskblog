@@ -17,6 +17,67 @@
         <button type="button" class="btn btn-danger btn-sm m-3"  data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
         {% endif %}
 
+    <div class="mt-3 d-flex align-items-center">
+        <!-- Like button form -->
+        <form action="{{ url_for('posts.like', post_id=post.id) }}" method="POST">
+            <button type="submit" class="btn btn-sm btn-outline-primary me-2">
+                {% if current_user in post.liked_by %}
+                    ❤️ Liked
+                {% else %}
+                    🤍 Like
+                {% endif %}
+            </button>
+        </form>
+
+        <!-- Likes count with modal trigger -->
+        <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#likesModal">
+            {{ post.liked_by.count() }} Likes
+        </a>
+    </div>
+
+
+<hr>
+<div class="comments-section mt-4">
+    <h5>Comments ({{ post.comments.count() }})</h5>
+
+    <!-- Comment Form -->
+    <form action="{{ url_for('posts.add_comment', post_id=post.id) }}" method="POST" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="content" class="form-control" placeholder="Write a comment..." required>
+            <button class="btn btn-primary" type="submit">Post</button>
+        </div>
+    </form>
+
+    <!-- Comments List -->
+    {% for comment in comments %}
+        <div class="d-flex align-items-start mb-3">
+            <a href="{{ url_for('users.user_posts', username=comment.user.username) }}">
+                <img src="{{ url_for('static', filename='profile_pics/' + comment.user.image_file) }}"
+                     alt="{{ comment.user.username }}"
+                     class="rounded-circle me-2"
+                     width="40" height="40">
+            </a>
+            <div>
+                <a href="{{ url_for('users.user_posts', username=comment.user.username) }}" class="fw-bold text-decoration-none">
+                    {{ comment.user.username }}
+                </a>
+                <p class="mb-1">{{ comment.content }}</p>
+                <small class="text-muted">{{ comment.date_posted.strftime('%d %b %Y, %I:%M %p') }}</small>
+                
+                {% if comment.user == current_user %}
+                    <!-- Delete Button for own comments -->
+                    <form action="{{ url_for('posts.delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline">
+                        <button class="btn btn-sm btn-link text-danger p-0 ms-2">Delete</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted">No comments yet. Be the first to comment!</p>
+    {% endfor %}
+</div>
+
+
 <!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -37,4 +98,34 @@
       </div>
     </div>
   </div>
+
+<!-- Likes Modal -->
+<div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="likesModalLabel">Liked by</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% for user in post.liked_by %}
+            <div class="d-flex align-items-center mb-2">
+                <a href="{{ url_for('users.user_posts', username=user.username) }}">
+                    <img src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" 
+                         class="rounded-circle me-2" width="30" height="30">
+                </a>
+                <a href="{{ url_for('users.user_posts', username=user.username) }}" class="fw-bold text-decoration-none">
+                    {{ user.username }}
+                </a>
+            </div>
+        {% else %}
+            <p class="text-muted">No one has liked this post yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {% endblock content %}
+

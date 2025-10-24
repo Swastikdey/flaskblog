@@ -60,6 +60,10 @@ def logout():
 @login_required
 def account():
     image_file=url_for( 'static', filename = "profile_pics/"+current_user.image_file ) 
+    page=request.args.get('page', 1, type=int)
+    posts=Post.query.filter_by(author=current_user)\
+        .order_by(Post.date_posted.desc())\
+        .paginate(per_page=5, page=page)
     form=UpdateForm()
     if form.validate_on_submit():
         if form.picture.data:
@@ -78,18 +82,19 @@ def account():
     elif request.method=='GET':
         form.username.data=current_user.username
         form.email.data=current_user.email
-    return render_template('account.html',title='Account', image_file=image_file, form=form)
+    return render_template('account.html',title='Account', image_file=image_file, form=form, posts=posts, user=current_user )
 
 
 
 @users.route('/user/<string:username>',methods=['get','post'])
-def user_posts(username):
+def user_posts(username): #user's profile page
     page=request.args.get('page', 1, type=int)
     user=User.query.filter_by(username=username).first_or_404()
+    image_file=url_for( 'static', filename = "profile_pics/"+user.image_file ) 
     posts=Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
         .paginate(per_page=5, page=page)
-    return render_template('user_posts.html', posts=posts, user=user)
+    return render_template('user_posts.html', posts=posts, user=user,image_file=image_file)
 
 
 @users.route('/reset_password',methods=['get','post'])
@@ -122,3 +127,36 @@ def reset_token(token):
         flash(f"Your Password has been updated! You can now Log In", "success") #category here is success
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
+
+#follow/unfollow
+
+@users.route("/follow/<int:user_id>", methods=['POST'])
+@login_required
+def follow(user_id):
+    user_to_follow = User.query.get_or_404(user_id)
+    if user_to_follow == current_user:
+        flash("You cannot follow yourself.", "warning")
+        return redirect(url_for('users.user_profile', username=user_to_follow.username))
+    
+    if user_to_follow in current_user.following:
+        flash("You are already following this user.", "info")
+    else:
+        current_user.following.append(user_to_follow)
+        db.session.commit()
+        flash(f"You are now following {user_to_follow.username}!", "success")
+    
+    return redirect(request.referrer or url_for('users.user_posts', username=user_to_follow.username))
+
+
+@users.route("/unfollow/<int:user_id>", methods=['POST'])
+@login_required
+def unfollow(user_id):
+    user_to_unfollow = User.query.get_or_404(user_id)
+    if user_to_unfollow in current_user.following:
+        current_user.following.remove(user_to_unfollow)
+        db.session.commit()
+        flash(f"You unfollowed {user_to_unfollow.username}.", "info")
+    else:
+        flash("You are not following this user.", "warning")
+    
+    return redirect(request.referrer or url_for('users.user_posts', username=user_to_unfollow.username))

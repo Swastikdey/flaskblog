@@ -3,7 +3,7 @@ from flask import render_template, url_for, flash,redirect, request,abort,Bluepr
 from my_app.posts.forms import (PostForm )
 from my_app import db
 from flask_login import current_user, login_required
-from my_app.models import Post
+from my_app.models import Post, Comment
  
 
 
@@ -25,10 +25,11 @@ def new_post():
     return render_template('create_post.html', title='New Post',
                            form=form,legend="New Post")
 
-@posts.route('/post/<int:post_id>')
+@posts.route('/post/<int:post_id>', methods=['get'])
 def post(post_id):
     post=Post.query.get_or_404(post_id)
-    return render_template('post.html',title=post.title, post=post)
+    comments = post.comments.order_by(Comment.date_posted.desc()).all()
+    return render_template('post.html',title=post.title, post=post, comments=comments )
 
 @posts.route('/post/<int:post_id>/update' ,methods=['get','post'])
 @login_required
@@ -61,3 +62,46 @@ def delete_post(post_id):
     flash("your post has been deleted.", 'success')
     return redirect(url_for('main.home'))
 
+#like and comments
+
+@posts.route("/like/<int:post_id>", methods=['POST'])
+@login_required
+def like(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post in current_user.liked_posts:
+        current_user.liked_posts.remove(post)
+        flash("You unliked the post.", "info")
+    else:
+        current_user.liked_posts.append(post)
+        flash("You liked the post!", "success")
+    
+    db.session.commit()
+    return redirect(request.referrer or url_for('posts.post', post_id=post.id))
+
+
+@posts.route("/comment/<int:post_id>", methods=['POST'])
+@login_required
+def add_comment(post_id):
+    content = request.form.get("content")
+    if not content.strip():
+        flash("Comment cannot be empty.", "warning")
+        return redirect(request.referrer or url_for('posts.post', post_id=post_id))
+
+    new_comment = Comment(content=content, user_id=current_user.id, post_id=post_id)
+    db.session.add(new_comment)
+    db.session.commit()
+    flash("Comment added!", "success")
+    return redirect(request.referrer or url_for('posts.post', post_id=post_id))
+
+@posts.route("/comment/<int:comment_id>/delete", methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    if comment.user_id != current_user.id and comment.post.author != current_user:
+        flash("You cannot delete this comment.", "danger")
+        return redirect(request.referrer or url_for('posts.post', post_id=comment.post_id))
+    
+    db.session.delete(comment)
+    db.session.commit()
+    flash("Comment deleted.", "info")
+    return redirect(request.referrer or url_for('posts.post', post_id=comment.post_id))

@@ -1,11 +1,67 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 {% block content %}
+<div class="container py-4">
+    <div class="content-section shadow-sm p-4 rounded bg-light">
+        <h2 class="text-center mb-4">About This Project</h2>
 
-    <article class="media content-section">
-        <div class="media-body">
-          
-          <h2><a class="article-title" href="#">Hi</a></h2>
-          
+        <p class="lead">
+            Welcome to <strong>FlaskBlog</strong> — a full-featured blogging web application built using the 
+            <strong>Flask</strong> framework. It allows users to share their thoughts, follow other writers, 
+            and interact with posts through comments and likes.
+        </p>
+
+        <hr>
+
+        <h4 class="mt-4">✨ Features</h4>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">📝 Create, edit, and delete posts with a rich interface.</li>
+            <li class="list-group-item">👥 User authentication — sign up, log in, and manage profiles securely.</li>
+            <li class="list-group-item">📸 Profile customization with user pictures and bio.</li>
+            <li class="list-group-item">❤️ Like and comment on posts.</li>
+            <li class="list-group-item">🔔 Follow and unfollow other users to build your own community.</li>
+            <li class="list-group-item">📄 Paginated posts for smooth browsing.</li>
+        </ul>
+
+        <hr>
+
+        <h4 class="mt-4">🧩 Tech Stack</h4>
+        <ul class="list-unstyled">
+            <li><strong>Backend:</strong> Flask, SQLAlchemy, Flask-Login, Flask-WTF</li>
+            <li><strong>Frontend:</strong> Bootstrap 5, Jinja2 Templates</li>
+            <li><strong>Database:</strong> SQLite (can be upgraded to PostgreSQL/MySQL)</li>
+        </ul>
+
+        <hr>
+
+        <h4 class="mt-4">🚀 Project Goals</h4>
+        <p>
+            This project was created to understand how a real-world web app works end-to-end:
+            user management, routing, form handling, template rendering, and database integration.
+            It also serves as a personal portfolio piece demonstrating web development skills with Flask.
+        </p>
+
+        <hr>
+
+        <h4 class="mt-4">👨‍💻 About the Developer</h4>  <a href="https://swastikdey.github.io/portfolio-page/">[Swastik's Portfolio]</a>
+        <p>
+            Hi, I'm <b>Swastik</b>, currently in my engineering 4th year. I have keen interest in technology and have hands on experience in building web applications full stack. I have expertise in Python and C++ language as I have solved coding problems in these. <br>
+<br>
+            <b>SKILLS:</b><br>
+            Programming Languages: Python, C/C++, Java, JavaScript<br>
+            Frameworks: Flask, Django<br>
+            ORM: SQLAlchemy<br>
+            Concepts(CS): OOP, DSA (250+ solved), DBMS, Networks, OS<br>
+            Tools: Git, Postman<br>
+<br>
+            <b>BEING HONEST:</b>
+            I started to code in my 3rd year and I sucked (maybe I still do). I spent hours every day to learn DSA, Backend, ML, etc. In this one year I haven't achieved much but solved around 280 problems (referring to solutions) and build one descent project by myself(mentioned in projects). I never got above 7 GPA until my 6th semester, where I got a 9.2. So yeah, I am hardworking, consistent and try to be excellent in what I do.
+
+            If you are a recruiter or someone who can help me get an internship, I would LOVEEE to work.
+        </p>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.home') }}" class="btn btn-outline-info">← Back to Home</a>
         </div>
-    </article>
+    </div>
+</div>
 {% endblock content %}
